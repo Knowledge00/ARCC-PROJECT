@@ -1,0 +1,38 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<form action="/action_page.php"></form>
+    <table>
+    <tr>
+        <td>S.no.</td>
+        <td>Required Capacity</td>
+        <td>Action</td>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td><input type ="text"  id = "src2" required/></td>
+        <td><input type="checkbox" checked /></td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td><input type ="text"  id = "src3"/></td> 
+        <td><input type = "checkbox"></td>
+    </tr>
+    <tr> 
+        <td>3</td>
+        <td><input type ="text"  id = "src3"/></td> 
+        <td><input type = "checkbox"></td>
+    </tr>
+    </table>
+<input type ="submit"></input>
+</form>
+<script>
+$('input[type="checkbox"]').change(function(){
+    var checked = $(this).is(':checked');
+    var input = $(this).closest('tr').find('input[type="text"]');
+    input.prop('required', checked)
+  })
+</script>
+<style>
+input:required {
+    background-color: red;
+   }
+</style>

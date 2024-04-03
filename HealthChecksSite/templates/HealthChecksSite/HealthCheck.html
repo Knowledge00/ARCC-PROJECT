@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" type="text/css" href="{% static 'HealthChecksSite/styles.css'%}">
+<script src= "https://code.jquery.com/jquery-1.12.4.min.js"> </script> 
+</head>     
+<body>
+<form action="" method = "post">
+  {% csrf_token %}
+  
+      <div class="autocomplete">
+        <input id="myInput" type="text" name="Gpsurgery" placeholder="GP " style="width:350px;" required><br><br>
+      </div>
+      <input id="myInput" type="text" name="Name" placeholder="Name" required><br><br>
+      <input id="myInput" type="text" name="Postcode" placeholder="Postcode"  required><br><br>
+      <input id="myInput" type="number" name="Waist" placeholder="Waist(cm)" step=".01"  required><br><br>
+      <input id="myInput" type="number" name="Weight" placeholder="Weight(kg)"  required><br><br>
+      <input id="myInput" type="number" name="Height" placeholder="Height(cm)"  required><br><br>
+      <input id="myInput" type="number" name="HeartRate" placeholder="Heart Rate"  required><br><br>
+      <input id="myInput" type="text" name="BloodP" placeholder="BloodP"  required><br><br>
+      <Label>Date of Birth</Label>
+      <input type="date" id="start" name="DOB" value="2018/07/22" min="1900/01/01" max="2024/12/31" required /><br><br>
+
+      <select name="consent" id="consent"required>
+        <option value="" disabled selected>Do you give consent for this healthcheck</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <br><br>
+      <select name="ethnicbg" id="ethnicbg"required>
+        <option value="" disabled selected>Ethnic Background</option>
+        <option value="White">White</option>
+        <option value="Black">Black</option>
+        <option value="South Asian">South Asian</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Mixed Ethnicity">Mixed Ethnicity</option>
+        <option value="Other">Other</option>
+      </select>
+      <br><br>
+      <select name="registerGP" id="registerGP"required>
+        <option value="" disabled selected>Are you registered with a croydon GP</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <br><br>
+      <select name="gender" id="gender"required>
+        <option value="" disabled selected>What is your sex</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+      <br><br>
+      <select name="historyDB" id="historyDB"required>
+        <option value="" disabled selected>Does anyone in your family have diabetes</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <br><br>
+      <select name="bloodpressure" id="bloodpressure"required>
+        <option value="" disabled selected>Do you take bloodpressure medication</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <br><br>
+      <select name="Pulse" id="Pulse"required>
+        <option value="" disabled selected>Did you have a regular or irregular pulse?</option>
+        <option value="Regular">Regular</option>
+        <option value="Irregular">Irregular</option>
+      </select>
+      <br><br>
+    <script>
+    function autocomplete(inp, arr) {
+      /*the autocomplete function takes two arguments,
+      the text field element and an array of possible autocompleted values:*/
+      var currentFocus;
+      /*execute a function when someone writes in the text field:*/
+      inp.addEventListener("input", function(e) {
+          var a, b, i, val = this.value;
+          /*close any already open lists of autocompleted values*/
+          closeAllLists();
+          if (!val) { return false;}
+          currentFocus = -1;
+          /*create a DIV element that will contain the items (values):*/
+          a = document.createElement("DIV");
+          a.setAttribute("id", this.id + "autocomplete-list");
+          a.setAttribute("class", "autocomplete-items");
+          /*append the DIV element as a child of the autocomplete container:*/
+          this.parentNode.appendChild(a);
+          /*for each item in the array...*/
+          for (i = 0; i < arr.length; i++) {
+            /*check if the item starts with the same letters as the text field value:*/
+            if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+              /*create a DIV element for each matching element:*/
+              b = document.createElement("DIV");
+              /*make the matching letters bold:*/
+              b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+              b.innerHTML += arr[i].substr(val.length);
+              /*insert a input field that will hold the current array item's value:*/
+              b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+              /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+                  /*insert the value for the autocomplete text field:*/
+                  inp.value = this.getElementsByTagName("input")[0].value;
+                  /*close the list of autocompleted values,
+                  (or any other open lists of autocompleted values:*/
+                  closeAllLists();
+              });
+              a.appendChild(b);
+            }
+          }
+      });
+      /*execute a function presses a key on the keyboard:*/
+      inp.addEventListener("keydown", function(e) {
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            /*If the arrow DOWN key is pressed,
+            increase the currentFocus variable:*/
+            currentFocus++;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 38) { //up
+            /*If the arrow UP key is pressed,
+            decrease the currentFocus variable:*/
+            currentFocus--;
+            /*and and make the current item more visible:*/
+            addActive(x);
+          } else if (e.keyCode == 13) {
+            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            e.preventDefault();
+            if (currentFocus > -1) {
+              /*and simulate a click on the "active" item:*/
+              if (x) x[currentFocus].click();
+            }
+          }
+      });
+      function addActive(x) {
+        /*a function to classify an item as "active":*/
+        if (!x) return false;
+        /*start by removing the "active" class on all items:*/
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        /*add class "autocomplete-active":*/
+        x[currentFocus].classList.add("autocomplete-active");
+      }
+      function removeActive(x) {
+        /*a function to remove the "active" class from all autocomplete items:*/
+        for (var i = 0; i < x.length; i++) {
+          x[i].classList.remove("autocomplete-active");
+        }
+      }
+      function closeAllLists(elmnt) {
+        /*close all autocomplete lists in the document,
+        except the one passed as an argument:*/
+        var x = document.getElementsByClassName("autocomplete-items");
+        for (var i = 0; i < x.length; i++) {
+          if (elmnt != x[i] && elmnt != inp) {
+            x[i].parentNode.removeChild(x[i]);
+          }
+        }
+      }
+      /*execute a function when someone clicks in the document:*/
+      document.addEventListener("click", function (e) {
+          closeAllLists(e.target);
+      });
+    }
+
+    /*An array containing all the country names in the world:*/
+    var countries = [
+        "Portland Medical Centre",
+        "Farley Road Surgery",
+        "Forestdale Branch",
+        "Upper Norwood Group Practice",
+        "New Addington Group Practice",
+        "Fieldway Medical Centre",
+        "Violet Lane Medical Practice",
+        "Addiscombe Road Surgery",
+        "Northway Road Surgery",
+        "Norbury Health Centre",
+        "South Norwood Hill Medical Centre",
+        "North Croydon Medical Centre",
+        "St James' Medical Practice",
+        "Castle Hill Surgery",
+        "Old Coulsdon Medical Practice",
+        "Queenhill Medical Practice",
+        "Parkside Group Practice",
+        "Keston & Moorings Medical Practice",
+        "Moorings Medical Practice",
+        "Brigstock and South Norwood Medical Partnership",
+        "Selsdon Park Medical Practice",
+        "Mitchley Avenue Surgery",
+        "Friends' Road Medical Practice",
+        "Eversley Medical Practice",
+        "London Road Medical Practice",
+        "Thornton Heath Medical Centre",
+        "Morland Road Surgery",
+        "Woodcote Medical",
+        "Coulsdon Branch",
+        "Parkway Health Centre",
+        "Addington Medical Practice",
+        "Gravel Hill Surgery",
+        "Hartland Way Surgery",
+        "Broom Road Medical Practice",
+        "Haling Park Partnership",
+        "Ashburton Park Medical Centre",
+        "Whitehorse Practice",
+        "Auckland Surgery",
+        "Stovell House Surgery",
+        "Mitchley Avenue Surgery",
+        "Leander Road Primary Care Centre",
+        "Shirley Medical Centre",
+        "East Croydon Medical Practice",
+        "Medics Headley Drive Surgery",
+        "Medics Thornton Road Surgery & Valley Park Surgery",
+        "Bramley Avenue Surgery",
+        "Parchmore Medical Centre",
+        "Brigstock Family Practice",
+        "Broughton Corner Family Practice",
+        "Mersham Medical Centre",
+        "Selhurst Medical Centre",
+        "Fairview Medical Centre",
+        "Broughton Corner Family Practice",
+        "Birdhurst Medical Practice",
+        "Greenside Group Practice",
+        "Edridge Road Community Health Centre",
+        "Country Park Practice",
+        "Denmark Road Surgery"];
+
+    /*initiate the autocomplete function on the "myInput" element, and pass along the countries array as possible autocomplete values:*/
+    autocomplete(document.getElementById("myInput"), countries);
+    </script>
+
+        <h3> 
+          Are you doing point of care testing today?
+        </h3> 
+        <div> 
+            <label>
+                <input id="Check" type="checkbox" name="colorCheckbox" 
+                      value="C">Yes</label><br><br>
+        </div> 
+        <div class="C selectt"> 
+            <input type="text" name="lipids CHOL" placeholder="Lipids reading: CHOL mmol/L" ><br><br>
+            <input type="text" name="lipids HDL" placeholder="Lipids reading: HDL mmol/L" ><br><br>
+            <input type="text" name="Lipids CHOL/HDL" placeholder="Lipids reading: CHOL/HDL mmol/L" ><br><br>
+            <input type="text" name="HbA1c" placeholder=" HbA1c reading mmol/mol" ><br><br>
+            <input type="text" name="Q-Risk Score" placeholder="Q-Risk Score" ><br><br>
+        </div> 
+        <script type="text/javascript"> 
+            $(document).ready(function() { 
+                $('input[type="checkbox"]').click(function() {
+                    var inputValue = $(this).attr("value"); 
+                    $("." + inputValue).toggle();
+                }); 
+            }); 
+        </script>         
+<input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
